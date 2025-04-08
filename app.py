@@ -4,7 +4,7 @@ import google.generativeai as genai
 
 app = Flask(__name__)
 
-# Load your API  (use environment variables for security)
+# Load your API  keys(use environment variables for security)
 import os
 NEWS_API_KEY = os.getenv("NEWS_API_KEY", "9fe3b81a5b4e42fd81bb0bc9aa10515e")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyCO0XnJzF02ZCGzUejTAjazCDWpbE6tjog")
