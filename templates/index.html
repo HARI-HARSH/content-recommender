@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>📰 AI NewsBot</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex">
+  <!-- Sidebar -->
+  <div class="w-64 bg-gray-800 h-screen p-4 flex flex-col">
+    <button id="new-chat-btn" class="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded mb-2">+ New Chat</button>
+    <div class="flex-1 overflow-y-auto">
+      <p class="text-gray-400 text-sm">No chats.</p>
+    </div>
+  </div>
+
+  <!-- Main Chat Area -->
+  <div class="flex-1 flex flex-col">
+    <div class="p-4 bg-gray-800 border-b border-gray-700"></div>
+    <div class="flex-1 flex items-center justify-center text-4xl font-bold hidden" id="chat-box-initial">
+      <div class="flex flex-col items-center">
+        <span class="text-6xl mb-2">🤖</span>
+        <span>Chatbot UI</span>
+      </div>
+    </div>
+    <div class="p-4 bg-gray-800 border-t border-gray-700" id="chat-box-messages">
+      <div class="message bot flex gap-3 mb-4 flex-row transition-all duration-300">
+        <div class="icon text-2xl">🤖</div>
+        <div class="text bg-blue-800 text-white p-4 rounded-xl shadow-sm font-medium">
+          <ul class="list-none space-y-2">
+            <li>I am a Content Recommender Chat-Bot</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="p-4 bg-gray-800 border-t border-gray-700 flex items-center">
+      <input type="text" id="user-input" class="flex-1 bg-gray-700 text-white p-2 rounded-l-lg focus:outline-none" placeholder="Send a message...">
+      <button onclick="sendMessage()" class="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-r-lg w-10 h-10 flex items-center justify-center">
+        <span class="text-xl">➤</span>
+      </button>
+    </div>
+    <div class="text-center text-xs text-gray-500 py-2">Developed by @12309884</div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    let isInitial = false;
+
+    document.getElementById('new-chat-btn').addEventListener('click', startNewChat);
+
+    function startNewChat() {
+      const chatBoxMessages = document.getElementById('chat-box-messages');
+      const userInput = document.getElementById('user-input');
+      
+      chatBoxMessages.innerHTML = `
+        <div class="message bot flex gap-3 mb-4 flex-row transition-all duration-300">
+          <div class="icon text-2xl">🤖</div>
+          <div class="text bg-blue-800 text-white p-4 rounded-xl shadow-sm font-medium">
+            <ul class="list-none space-y-2">
+              <li>I am a Content Recommender Chat-Bot</li>
+            </ul>
+          </div>
+        </div>
+      `;
+      
+      userInput.value = '';
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('user-input');
+      const message = input.value.trim();
+      if (!message) return;
+
+      if (!isInitial) {
+        isInitial = true;
+      }
+
+      // Append user message to chat
+      appendMessage("🧑‍💼", message, "user");
+      input.value = "";
+
+      fetch("/get_news", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
+      })
+      .then(res => res.json())
+      .then(data => {
+        appendMessage("🤖", data.reply, "bot");
+      });
+    }
+
+    function appendMessage(icon, message, type) {
+      const box = document.getElementById('chat-box-messages');
+      const msg = document.createElement('div');
+      msg.className = `message ${type} flex gap-3 mb-4 ${type === 'user' ? 'flex-row-reverse' : 'flex-row'} transition-all duration-300`;
+      const textClass = type === 'user' ? 'bg-green-800 text-white' : 'bg-blue-800 text-white';
+      const lines = message.split('\n').filter(line => line.trim().startsWith('➤') || line.trim());
+      const listItems = lines.map(line => `<li class="ml-4">${line.replace('➤', '')}</li>`).join('');
+      msg.innerHTML = `
+        <div class="icon text-2xl">${icon}</div>
+        <div class="text ${textClass} p-4 rounded-xl shadow-sm font-medium">
+          <ul class="list-none space-y-4">${listItems}</ul>
+        </div>
+      `;
+      box.appendChild(msg);
+      box.scrollTop = box.scrollHeight;
+    }
+  </script>
+</body>
+</html>
