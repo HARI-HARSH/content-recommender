@@ -107,5 +107,5 @@ Acknowledgements
 
 Contact
 For questions or support, reach out to the developer:
-- GitHub: your-username (https://github.com/your-username)
-- Email: your-email@example.com (replace with your contact)
+- GitHub: your- (https://github.com/HARI-HARSH)
+- Email: your- harshkumarthakur274@gmail.com 
